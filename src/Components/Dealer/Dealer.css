@@ -1,0 +1,12 @@
+.dealer {
+    margin-bottom: 10px;
+}
+.cards {
+    margin-bottom: 10px;
+}
+.history {
+    position: absolute;
+    right: 0;
+    background: yellowgreen;
+    border-radius: 10px;
+}
