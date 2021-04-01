@@ -3,13 +3,14 @@ import './Player.css';
 
 class Player extends React.Component{
     render() {
+        const {playerValue, playerValueTotal, playerData} = this.props;
         return(
             <>
                 <div className="player">
-                    Player: {this.props.playerValue}/{this.props.playerValueTotal}
+                    Player: {playerValue}/{playerValueTotal}
                 </div>
                 <div className="cards">
-                    {this.props.playerData}
+                    {playerData}
                 </div>
             </>
         )

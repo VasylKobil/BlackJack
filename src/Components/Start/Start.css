@@ -1,0 +1,38 @@
+.start{
+    background: url("../../Assets/images/blackjack.jpg");
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    text-align: center;
+}
+.title{
+    position: absolute;
+    top: 20%;
+    left: calc(50% - 130px);
+    z-index: 2;
+}
+.title h1{
+    color: yellow;
+    font-size: 50px;
+}
+.start button{
+    position: absolute;
+    top: 50%;
+    left: calc(50% - 52px);
+    border-radius: 20px;
+    width: auto;
+    background-color: yellow;
+    font-family: Bahnschrift;
+    font-size: large;
+    border: 1px solid black;
+    margin: 0;
+    padding: 5px;
+}
+.start button:hover{
+    cursor: pointer;
+}
+.start button:active{
+    background: yellowgreen;
+}

@@ -4,9 +4,29 @@
 .cards {
     margin-bottom: 10px;
 }
-.history {
+.container_ham{
+    position: absolute;
+    right: 10px;
+}
+.burger {
     position: absolute;
     right: 0;
-    background: yellowgreen;
-    border-radius: 10px;
+    height: auto;
+    width: 150px;
+    background-color: silver;
+    border: black solid 1px;
+}
+.burger li{
+    list-style-type: none;
+}
+.burger ul {
+    padding:10px 0 10px 0;
+    width: auto;
+}
+.burger ul a {
+
+}
+ul:hover {
+    background-color: rgba(0, 0, 0, 0.14);
+    cursor: pointer;
 }

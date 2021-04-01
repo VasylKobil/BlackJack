@@ -17,7 +17,7 @@ class Controls extends React.Component{
     };
 
     render() {
-        const {onclickResetGame ,onclickReset, onclickDouDown, onclickStand, onclickHit, onclickDeal, onClickBetMin, onClickBetMid, onClickBetMax} = this.props;
+        const {onclickDouDown, onclickStand, onclickHit, onclickDeal, onClickBetMin, onClickBetMid, onClickBetMax} = this.props;
         return(
             <>
                 <div className="bets">
@@ -30,8 +30,6 @@ class Controls extends React.Component{
                     <button className={"btn " + this.buttonVisible(false)} onClick={onclickHit}>Hit</button>
                     <button className={"btn " + this.buttonVisible(false)} onClick={onclickStand}>Stand</button>
                     <button className={"btn " + this.buttonVisible(false)} onClick={onclickDouDown}>Double Down</button>
-                    <button className={"btn"} onClick={onclickReset}>Reset Round</button>
-                    <button className={"btn"} onClick={onclickResetGame}>Reset Game</button>
                 </div>
             </>
         )
