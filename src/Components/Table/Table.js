@@ -5,6 +5,7 @@ import Player from "../Player/Player";
 import Controls from "../Controls/Controls";
 import Start from "../Start/Start";
 import functions from "../../services/functions";
+import Moment from "moment";
 
 
 class Table extends React.Component {
@@ -28,11 +29,7 @@ class Table extends React.Component {
             dealerValueTotal: 0,
             play: false,
             gameStatus: null,
-            ele1: null,
-            ele2: null,
-            ele3: null,
-            ele4: null,
-            ele5: null
+            ele: null
         }
         this.passDate = this.passDate.bind(this);
 
@@ -101,7 +98,6 @@ class Table extends React.Component {
             status = "Player Wins!!!";
             this.saveData(status);
         }
-        console.log('check Bust ' + status);
 
         this.setState({
             gameStatus: status
@@ -113,7 +109,6 @@ class Table extends React.Component {
 
         value1 = this.calcCards(dealerCards, false);
         value2 = this.calcCards(dealerCards, true);
-        console.log(value1 , value2 );
 
         if (Math.min(value1, value2) > 21) {
             status = "Player Wins!!!";
@@ -175,9 +170,7 @@ class Table extends React.Component {
     };
 
     onHit = async () => {
-        console.log('go');
         if (this.state.gameStatus !== null) return;
-        console.log('stop');
         let deck = await functions(this.state.deck);
         let playerCards = this.state.playerData
         this.drawCards(deck, playerCards, 1);
@@ -254,67 +247,40 @@ class Table extends React.Component {
             dealerValueTotal: 0,
             play: false,
             gameStatus: null,
-            ele1: null,
-            ele2: null,
-            ele3: null,
-            ele4: null,
-            ele5: null
+            ele: null
         });
     }
     saveData = (status) => {
-        console.log(status);
         const dataLastGame = localStorage.dataGame ? JSON.parse(localStorage.dataGame) : null;
         this.setState(dataLastGame);
-        let latestRound = {status: status, bet: this.state.bet};
+        let latestRound = {data: Moment(new Date()).format('LTS'), status: status, bet: this.state.bet};
         this.state.dataLastGame.push(latestRound);
         localStorage.dataGame = JSON.stringify(this.state.dataLastGame);
     }
 
     onHistory = () => {
-        // if (!localStorage.dataGame || this.state.ele1) {
-        //     return;
-        // }
+        if (!localStorage.dataGame || this.state.ele1) return;
         const dataLatestGames = JSON.parse(localStorage.dataGame);
         const lastFiveGames = dataLatestGames.slice(Math.max(dataLatestGames.length - 5, 0)).reverse();
         this.renderHtml(lastFiveGames);
-        console.log(lastFiveGames);
     }
 
     renderHtml = (data) => {
-        if(data[0]){
-            const Ele1 = 'Last Result ' + data[0].status + ' = ' + data[0].bet;
-            this.setState({
-                ele1: Ele1
-            })
-        }
-        if(data[1]){
-            const Ele2 = data[1].status + ' = ' + data[1].bet;
-            this.setState({
-                ele2: Ele2
-            })
-        }
-        if(data[2]){
-            const Ele3 = data[2].status + ' = ' + data[2].bet;
-            this.setState({
-                ele3: Ele3
-            })
-        }
-        if(data[3]){
-            const Ele4 = data[3].status + ' = ' + data[3].bet;
-            this.setState({
-                ele4: Ele4
-            })
-        }if(data[4]){
-            const Ele5 = data[4].status + ' = ' + data[4].bet;
-            this.setState({
-                ele5: Ele5
-            })
-        }
+        const array = [];
+        data.forEach((ele) =>{
+            const Ele = <li>{ele.data} {ele.status} = {ele.bet}</li>;
+            array.push(Ele);
+        })
+        this.setState({
+            ele: <div className="dropdown" onClick={this.clear}>
+                        <ul>{array[0]}{array[1]}{array[2]}{array[3]}{array[4]}</ul>
+                    </div>
+        })
     }
 
     clear = () => {
         this.setState({
-            ele1: null
+            ele: null
         })
     }
 
@@ -332,7 +298,7 @@ class Table extends React.Component {
 
 
     render() {
-        const {play, chips, bet, dealerData, playerData, dealerValue, playerValue, dealerValueTotal, playerValueTotal, gameStatus, content, ele1, ele2, ele3, ele4, ele5} = this.state;
+        const {play, chips, bet, dealerData, playerData, dealerValue, playerValue, dealerValueTotal, playerValueTotal, gameStatus, content, ele} = this.state;
 
         return(
             <>
@@ -372,15 +338,7 @@ class Table extends React.Component {
                     {gameStatus ? <div className="message" onClick={this.onReset}>
                         <p>{gameStatus}</p>
                     </div> : null}
-                    {ele1 ? <div className="dropdown" onClick={this.clear}>
-                        <ul>
-                            <li>{ele1}</li>
-                            <li>{ele2}</li>
-                            <li>{ele3}</li>
-                            <li>{ele4}</li>
-                            <li>{ele5}</li>
-                        </ul>
-                    </div> : null}
+                    {ele ? ele : null}
                 </div>
             </>
         )

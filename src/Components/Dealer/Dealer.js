@@ -12,9 +12,9 @@ function Dealer(props) {
                 <Hamburger toggled={isOpen} toggle={setOpen}/>
                 {isOpen ? <div className="burger">
                     <li>
-                        <ul><a className="btn" onClick={onHistory}>History</a></ul>
-                        <ul><a className="btn" onClick={onclickReset}>Reset Round</a></ul>
-                        <ul><a className="btn" onClick={onclickResetGame}>Reset Game</a></ul>
+                        <ul><button className="btn" onClick={onHistory}>History</button></ul>
+                        <ul><button className="btn" onClick={onclickReset}>Reset Round</button></ul>
+                        <ul><button className="btn" onClick={onclickResetGame}>Reset Game</button></ul>
                     </li>
                 </div> : null}
                 {dropdown ?
