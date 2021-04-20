@@ -2,7 +2,7 @@
   "name": "blackjack",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://vasylkobil.github.io/blackjack",
+  "homepage": "https://vasylkobil.github.io/BlackJack/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.10",
     "@testing-library/react": "^11.2.6",
