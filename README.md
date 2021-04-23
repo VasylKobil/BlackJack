@@ -1,6 +1,10 @@
-### Game Black Jack 
+# Project Black Jack 
 
-# [Play Game live](https://vasylkobil.github.io/BlackJack/)
+**This application vividly reveals my skills
+and experience in React framework and React Hooks. This App is
+connected with API, which providing the App with deck of cards' data ([sourse](https://deckofcardsapi.com/)). It's available for all devises.**
+
+## [Play Game live](https://vasylkobil.github.io/BlackJack/)
 
 Black Jack is very great game. It's popular game and is the American 
 member of global family of banking games. Also it known as Twenty-one.
@@ -10,7 +14,7 @@ compete against each other. This game played with one or more decks of 52 cards.
 
 
 
-###RULES
+## RULES
 
 Players are each dealt two cards, face up or down depending on the casino and the table.
 In the U.S., the dealer is also dealt two cards, normally one up (exposed) and one down (hidden). 
