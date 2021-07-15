@@ -1,10 +1,10 @@
-import DeckOfCards from "./api";
+import {requests} from "./api";
 
-const checkDeck = async (deck) => {
-    if(deck.length < 10 || !deck){
-        deck = await DeckOfCards.generateDeck();
+export const list = {
+    checkDeck: async function (deck){
+        if(deck.length < 10 || !deck){
+            deck = await requests.getDeck();
+        }
+        return deck;
     }
-    return deck;
 }
-
-export default checkDeck;

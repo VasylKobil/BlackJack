@@ -3,8 +3,7 @@ import './Table.css';
 import Dealer from "../Dealer/Dealer";
 import Player from "../Player/Player";
 import Controls from "../Controls/Controls";
-import Start from "../Start/Start";
-import functions from "../../services/functions";
+import {list} from "../../services/functions";
 import Moment from "moment";
 
 
@@ -77,8 +76,7 @@ class Table extends React.Component {
     };
 
     drawCards = (deck, playerCards, numOfCards) => {
-        let i;
-        for (i = 1; i <= numOfCards; i++) {
+        for (let i = 1; i <= numOfCards; i++) {
             let card = deck.pop();
             playerCards.push(card);
         }
@@ -128,7 +126,7 @@ class Table extends React.Component {
         if (playerTotal > 21){
             playerTotal = Math.min(this.state.playerValue, this.state.playerValueTotal);
         }
-        let deck = await functions(this.state.deck);
+        let deck = await list.checkDeck(this.state.deck);
         let dealerCards = this.state.dealerCards;
         let status = this.checkDealerStatus(dealerCards, playerTotal);
 
@@ -152,7 +150,7 @@ class Table extends React.Component {
         if(this.state.bet === 0){
             return;
         }
-        let deck = await functions(this.state.deck);
+        let deck = await list.checkDeck(this.state.deck);
         let dealerData = this.state.dealerData;
         let playerData = this.state.playerData;
 
@@ -171,7 +169,7 @@ class Table extends React.Component {
 
     onHit = async () => {
         if (this.state.gameStatus !== null) return;
-        let deck = await functions(this.state.deck);
+        let deck = await list.checkDeck(this.state.deck);
         let playerCards = this.state.playerData
         this.drawCards(deck, playerCards, 1);
 
@@ -298,12 +296,11 @@ class Table extends React.Component {
 
 
     render() {
-        const {play, chips, bet, dealerData, playerData, dealerValue, playerValue, dealerValueTotal, playerValueTotal, gameStatus, content, ele} = this.state;
+        const {play, chips, bet, dealerData, playerData, dealerValue, playerValue, dealerValueTotal, playerValueTotal, gameStatus, ele} = this.state;
 
         return(
             <>
-                <Start parentCallBack = {this.passDate}/>
-                <div style={{display: this.state.visible ? 'block' : 'none'}}>
+                <div>
                     <Dealer
                         onHistory={this.onHistory}
                         onclickReset={this.onReset}
@@ -312,7 +309,6 @@ class Table extends React.Component {
                         dealerValueTotal={dealerValueTotal}
                         dealerData={dealerData.map(card => <img alt='card' key={card.code} src={card.image} height="150px"/>)}
                     />
-                    {content}
                     <Player
                         playerValue={playerValue}
                         playerValueTotal={playerValueTotal}

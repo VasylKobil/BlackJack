@@ -1,8 +1,8 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import './Dealer.css';
 import Hamburger from 'hamburger-react';
 
-function Dealer(props) {
+export default function Dealer(props) {
     const {onclickResetGame, onclickReset, onHistory, dropdown, dealerValue, dealerValueTotal, dealerData} = props;
     const [isOpen, setOpen] = useState(false);
 
@@ -32,5 +32,3 @@ function Dealer(props) {
         </>
     )
 }
-
-export default Dealer;
