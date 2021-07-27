@@ -1,9 +1,11 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import './Dealer.css';
 import Hamburger from 'hamburger-react';
+import {connect} from "react-redux";
 
-export default function Dealer(props) {
-    const {onclickResetGame, onclickReset, onHistory, dropdown, dealerValue, dealerValueTotal, dealerData} = props;
+function Dealer(props) {
+    const {state} = props.state
+    const {onclickResetGame, onclickReset, onHistory, dropdown} = props;
     const [isOpen, setOpen] = useState(false);
 
     return (
@@ -24,11 +26,18 @@ export default function Dealer(props) {
 
             </div>
             <div className="dealer">
-                Dealer: {dealerValue}/{dealerValueTotal}
+                Dealer: {state.dealerValue}/{state.dealerValueSum}
             </div>
             <div className="cards">
-                {dealerData}
+                {state.dealerCards.flat().map(card => <img alt={'card ' + card.value} key={card.code} src={card.image} height="150px"/>)}
             </div>
         </>
     )
 }
+const mapStateToProps = state => {
+    return {
+        state: state
+    }
+}
+
+export default connect(mapStateToProps, null)(Dealer)

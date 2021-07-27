@@ -1,211 +1,117 @@
-import React from "react";
+import React, { useEffect, useState} from "react";
 import './Table.css';
 import Dealer from "../Dealer/Dealer";
 import Player from "../Player/Player";
-import Controls from "../Controls/Controls";
+import Controls from "../ControlButtons/ControlButtons";
 import {list} from "../../services/functions";
 import Moment from "moment";
+import {connect} from "react-redux";
+import {
+    addDealerCards,
+    addPlayerCards,
+    changeBet, dealerValue,
+    dealerValueSum,
+    playerValue, playerValueSum,
+    playGame,
+    saveDeck
+} from "../../Redux/actions";
 
 
-class Table extends React.Component {
-    constructor(props) {
-        super(props);
+const Table = (props) => {
+    const {state} = props.state
+    const {changeBet, addPlayerCards, addDealerCards, saveDeck, playGame, dealerValue, dealerValueSum, playerValue, playerValueSum} = props
+    const [sto, setState] = useState('');
 
-        this.state = {
-            visible: false,
-            savedState: [],
-            dataLastGame: [],
-            deck: '',
-            chips: 1000,
-            bet: 0,
-            playerData: [],
-            playerCards: [],
-            playerValue: 0,
-            playerValueTotal: 0,
-            dealerData: [],
-            dealerCards: [],
-            dealerValue: 0,
-            dealerValueTotal: 0,
-            play: false,
-            gameStatus: null,
-            ele: null
-        }
-        this.passDate = this.passDate.bind(this);
 
-    }
-
-    passDate(data){
-        if (!data){
-            return;
-        }
-        const newData = JSON.parse(JSON.stringify(data));
-        this.setState( {
-            deck: newData,
-            visible: true
-        })
-    }
-
-    takeBet = (valueBet) => {
-        this.setState(prevState => ({
-            bet: prevState.bet + valueBet,
-            chips: prevState.chips - valueBet
-        }));
-    }
-    countCards = () => {
-        this.setState( prevState =>({
-            dealerValue: this.calcCards(this.state.dealerCards, false),
-            playerValue: this.calcCards(this.state.playerCards, false),
-            dealerValueTotal: this.calcCards(this.state.dealerCards, true),
-            playerValueTotal: this.calcCards(this.state.playerCards, true)
-        }))
-    }
-
-    calcCards = (cards, value) => {
-        let sumCards = Object.keys(cards).reduce((total, card) => {
-            let cardVal = cards[card].value;
-            if(cardVal === "ACE"){
-                cardVal = 1;
-            }else if(cardVal === "KING" || cardVal === "QUEEN" || cardVal === "JACK"){
-                cardVal = 10;
-            }
-            cardVal = Number(cardVal);
-            cardVal = (cardVal === 1 && value) ? 11 : cardVal;
-            return Number(total) + cardVal;
-        }, 0);
-        return sumCards;
-    };
-
-    drawCards = (deck, playerCards, numOfCards) => {
-        for (let i = 1; i <= numOfCards; i++) {
-            let card = deck.pop();
-            playerCards.push(card);
-        }
-        return playerCards;
-    };
-
-    checkBust = () => {
-        let value1, value2, min, status = "";
-        value1 = this.calcCards(this.state.playerData, false);
-        value2 = this.calcCards(this.state.playerData, true);
-        min = Math.min(value1, value2);
-
-        if (min > 21) {
-            status = "Player Bust!!!";
-            this.saveData(status);
-        }else if(min === 21){
-            status = "Player Wins!!!";
-            this.saveData(status);
-        }
-
-        this.setState({
-            gameStatus: status
-        });
-    };
-
-    checkDealerStatus = (dealerCards, playerTotal) => {
-        let value1, value2, status = "";
-
-        value1 = this.calcCards(dealerCards, false);
-        value2 = this.calcCards(dealerCards, true);
-
-        if (Math.min(value1, value2) > 21) {
-            status = "Player Wins!!!";
-            this.saveData(status);
-        }else if ((value1 <= 21 && value1 === playerTotal) || (value2 <= 21 && value2 === playerTotal)) {
-            status = "Push";
-            this.saveData(status);
-        }else if ((value1 <= 21 && value1 > playerTotal) || (value2 <= 21 && value2 > playerTotal)) {
-            status = "Dealer wins!!!";
-            this.saveData(status);
-        }
-        return status;
-    };
-
-    onStay = async () => {
-        let playerTotal = Math.max(this.state.playerValue, this.state.playerValueTotal);
+    const onStay = async () => {
+        let playerTotal = Math.max(state.playerValue, state.playerValueTotal);
         if (playerTotal > 21){
-            playerTotal = Math.min(this.state.playerValue, this.state.playerValueTotal);
+            playerTotal = Math.min(state.playerValue, state.playerValueTotal);
         }
-        let deck = await list.checkDeck(this.state.deck);
-        let dealerCards = this.state.dealerCards;
-        let status = this.checkDealerStatus(dealerCards, playerTotal);
+        let deck = await list.checkDeck(state.deck);
+        let dealerCards = state.dealerCards;
+        let status = list.checkDealerStatus(dealerCards, playerTotal);
+        saveData(status);
 
         if (status === "") {
             do {
-                this.drawCards(deck, dealerCards, 1);
-                status = this.checkDealerStatus(dealerCards, playerTotal);
+                list.drawCards(deck, dealerCards, 1);
+                status = list.checkDealerStatus(dealerCards, playerTotal);
             }
             while(status === "");
         }
 
-        this.setState(prevState => ({
+        setState(Object.assign(state, {
             deck: deck,
             dealerCards: dealerCards,
             gameStatus: status,
         }));
-        this.countCards();
+        // countCards();
     };
 
-    onDeal = async () => {
-        if(this.state.bet === 0){
-            return;
-        }
-        let deck = await list.checkDeck(this.state.deck);
-        let dealerData = this.state.dealerData;
-        let playerData = this.state.playerData;
+    const countCards = () => {
+        dealerValue(list.calcCards(state.dealerCards, false))
+        dealerValueSum(list.calcCards(state.dealerCards, true))
+        playerValue(list.calcCards(state.playerCards, false))
+        playerValueSum(list.calcCards(state.playerCards, true))
+    }
 
-        this.drawCards(deck, dealerData, 2);
-        this.drawCards(deck, playerData, 2);
-
-        this.setState({
-            deck: deck,
-            dealerCards: dealerData,
-            playerCards: playerData,
-            play: true
-        }, function (){
-            this.countCards();
-        });
+    const onDeal = async () => {
+        if(state.bet === 0){return}
+        let deck = await list.checkDeck(state.deck);
+        const dealerCards = [];
+        const playerCards = [];
+        list.drawCards(deck, dealerCards, 2);
+        list.drawCards(deck, playerCards, 2);
+        addPlayerCards(playerCards);
+        addDealerCards(dealerCards);
+        saveDeck(deck);
+        playGame(true);
+        countCards();
     };
 
-    onHit = async () => {
-        if (this.state.gameStatus !== null) return;
-        let deck = await list.checkDeck(this.state.deck);
-        let playerCards = this.state.playerData
-        this.drawCards(deck, playerCards, 1);
+    const onHit = async () => {
+        if (state.gameStatus !== null) return;
+        let deck = await list.checkDeck(state.deck);
+        let playerCards = state.playerData
+        list.drawCards(deck, playerCards, 1);
 
-        this.setState(prevState => ({
+        setState(Object.assign(state, {
             playerCards: playerCards,
             deck: deck
         }));
-        let dealerData = this.state.dealerData
-        let playerValue = this.state.playerValueTotal
-        let status = this.checkDealerStatus(dealerData, playerValue);
-        this.setState({
+        let dealerData = state.dealerData
+        let playerValue = state.playerValueTotal
+        let status = list.checkDealerStatus(dealerData, playerValue);
+        setState(Object.assign(state, {
             gameStatus: status
-        });
-        this.countCards();
-        this.checkBust();
+        }));
+        // countCards();
+        status = list.checkBust(state.playerData);
+        saveData(status);
+        setState(Object.assign(state, {
+            gameStatus: status
+        }));
     };
 
-    onDown = () => {
-        if (this.state.gameStatus !== null) return;
-        let bet = this.state.bet;
-        if (bet >= 1000){
+    const onDown = () => {
+        if (state.gameStatus !== null) return;
+        if (state.bet >= 1000){
             return;
         }
-        this.takeBet(bet);
+        changeBet(state.bet);
     };
 
 
-    onReset = () => {
-        if (this.state.bet === 0) return;
-        let chips = this.state.chips;
-        let bet = this.state.bet;
+    const onReset = () => {
+        if (state.bet === 0) return;
+        let chips = state.chips;
+        let bet = state.bet;
 
-        if (this.state.gameStatus === "Push") {
+        if (state.gameStatus === "Push") {
             chips = chips + bet;
         }
-        else if (this.state.gameStatus === "Player Wins!!!") {
+        else if (state.gameStatus === "Player Wins!!!") {
             chips = chips + (bet * 1.5);
         }
 
@@ -226,7 +132,7 @@ class Table extends React.Component {
         });
     };
 
-    onresetGame = () => {
+    const onresetGame = () => {
         localStorage.clear();
         this.setState({
             visible: true,
@@ -248,97 +154,96 @@ class Table extends React.Component {
             ele: null
         });
     }
-    saveData = (status) => {
+    const saveData = (status) => {
         const dataLastGame = localStorage.dataGame ? JSON.parse(localStorage.dataGame) : null;
         this.setState(dataLastGame);
-        let latestRound = {data: Moment(new Date()).format('LTS'), status: status, bet: this.state.bet};
-        this.state.dataLastGame.push(latestRound);
-        localStorage.dataGame = JSON.stringify(this.state.dataLastGame);
+        let latestRound = {data: Moment(new Date()).format('LTS'), status: status, bet: state.bet};
+        state.dataLastGame.push(latestRound);
+        localStorage.dataGame = JSON.stringify(state.dataLastGame);
     }
 
-    onHistory = () => {
-        if (!localStorage.dataGame || this.state.ele1) return;
+    const onHistory = () => {
+        if (!localStorage.dataGame || state.ele1) return;
         const dataLatestGames = JSON.parse(localStorage.dataGame);
         const lastFiveGames = dataLatestGames.slice(Math.max(dataLatestGames.length - 5, 0)).reverse();
-        this.renderHtml(lastFiveGames);
+        renderHtml(lastFiveGames);
     }
 
-    renderHtml = (data) => {
+    const renderHtml = (data) => {
         const array = [];
         data.forEach((ele) =>{
             const Ele = <li>{ele.data} {ele.status} = {ele.bet}</li>;
             array.push(Ele);
         })
         this.setState({
-            ele: <div className="dropdown" onClick={this.clear}>
+            ele: <div className="dropdown" onClick={clear}>
                         <ul>{array[0]}{array[1]}{array[2]}{array[3]}{array[4]}</ul>
                     </div>
         })
     }
 
-    clear = () => {
+    const clear = () => {
         this.setState({
             ele: null
         })
     }
 
-    componentDidMount() {
+    useEffect(()=>{
         const savedState = localStorage.table ? JSON.parse(localStorage.table) : null;
-        this.setState(savedState);
+        setState(savedState);
         window.onbeforeunload = () => {
-            this.setState({
-                visible: false
-            })
-            localStorage.table = JSON.stringify(this.state);
+            localStorage.table = JSON.stringify(state);
             return "Do you really want to close?";
-        };
-    };
+        }
+        // eslint-disable-next-line
+    },[]);
 
-
-    render() {
-        const {play, chips, bet, dealerData, playerData, dealerValue, playerValue, dealerValueTotal, playerValueTotal, gameStatus, ele} = this.state;
-
-        return(
-            <>
-                <div>
-                    <Dealer
-                        onHistory={this.onHistory}
-                        onclickReset={this.onReset}
-                        onclickResetGame={this.onresetGame}
-                        dealerValue={dealerValue}
-                        dealerValueTotal={dealerValueTotal}
-                        dealerData={dealerData.map(card => <img alt='card' key={card.code} src={card.image} height="150px"/>)}
-                    />
-                    <Player
-                        playerValue={playerValue}
-                        playerValueTotal={playerValueTotal}
-                        playerData={playerData.map(card => <img alt='card' key={card.code} src={card.image} height="150px"/>)}
-                    />
-                    <div className="bet">
-                        Bet: {bet}$
-                    </div>
-                    <div className="chips">
-                        Wallet: {chips}$
-                    </div>
-                    <Controls
-                        play={play}
-                        bet={bet}
-                        onclickDeal={this.onDeal}
-                        onclickHit={this.onHit}
-                        onclickDouDown={this.onDown}
-                        onclickStand={this.onStay}
-                        onClickBetMin={() => !this.state.play ? this.takeBet(5) : null}
-                        onClickBetMid={() => !this.state.play ? this.takeBet(15) : null}
-                        onClickBetMax={() => !this.state.play ? this.takeBet(30) : null}
-                    />
-                    {gameStatus ? <div className="message" onClick={this.onReset}>
-                        <p>{gameStatus}</p>
-                    </div> : null}
-                    {ele ? ele : null}
+    return(
+        <>
+            <div>
+                <Dealer
+                    onHistory={onHistory}
+                    onclickReset={onReset}
+                    onclickResetGame={onresetGame}
+                />
+                <Player/>
+                <div className="bet">
+                    Bet: {state.bet}$
                 </div>
-            </>
-        )
-    }
+                <div className="chips">
+                    Wallet: {state.chips}$
+                </div>
+                <Controls
+                    play={state.playGame}
+                    bet={state.bet}
+                    onclickDeal={onDeal}
+                    onclickHit={onHit}
+                    onclickDouDown={onDown}
+                    onclickStand={onStay}
+                />
+                {state.gameStatus ? <div className="message" onClick={onReset}>
+                    <p>{state.gameStatus}</p>
+                </div> : null}
+                {state.ele ? state.ele : null}
+            </div>
+        </>
+    )
 }
 
-export default Table;
+const mapStateToProps = state => {
+    return {
+        state: state
+    }
+}
+const mapDispatchToProps = {
+    changeBet,
+    addPlayerCards,
+    addDealerCards,
+    saveDeck,
+    playGame,
+    dealerValue,
+    dealerValueSum,
+    playerValue,
+    playerValueSum
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Table)

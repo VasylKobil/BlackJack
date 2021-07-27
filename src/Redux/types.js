@@ -1,0 +1,9 @@
+export const SAVE_DECK = 'SAVE_DECK';
+export const CHANGE_BET = 'CHANGE_BET';
+export const ADD_PLAYER_CARDS = 'ADD_PLAYER_CARDS';
+export const ADD_DEALER_CARDS = 'ADD_DEALER_CARDS';
+export const PLAY_GAME = 'PLAY_GAME';
+export const DEALER_VALUE = 'DEALER_VALUE';
+export const DEALER_VALUE_SUM = 'DEALER_VALUE_SUM';
+export const PLAYER_VALUE = 'DEALER_VALUE';
+export const PLAYER_VALUE_SUM = 'DEALER_VALUE_SUM';
